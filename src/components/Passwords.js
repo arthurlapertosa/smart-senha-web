@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000/api'
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 function Passwords() {
     const [passwords, setPasswords] = useState([]);
@@ -10,20 +10,19 @@ function Passwords() {
     const navigate = useNavigate();
 
     const getPasswords = async () => {
-        try {
-            const { id } = params;
-            const result = await axios.get(`${BASE_URL}/password/byEstablishment/${id}`);
-            return result;
-        }
-        catch (err) {
-            console.error(err);
-            return passwords;
-        }
+        const { id } = params;
+        const result = await axios.get(`${BASE_URL}/password/byEstablishment/${id}`);
+        return result;
     }
 
     const updatePasswords = async () => {
-        const passwords = await getPasswords();
-        setPasswords(passwords.data)
+        try {
+            const passwords = await getPasswords();
+            setPasswords(passwords.data)
+        }
+        catch (err) {
+            console.error(err);
+        }
     }
 
     const setAsAttended = async (id) => {
@@ -38,7 +37,7 @@ function Passwords() {
 
     const deletePassword = async (id) => {
         try {
-            await axios.delete(BASE_URL + '/password/' + id);
+            await axios.delete(`${BASE_URL}/password/${id}`);
             updatePasswords();
         }
         catch (err) {
@@ -48,7 +47,7 @@ function Passwords() {
 
     useEffect(() => {
         updatePasswords();
-    })
+    }, [])
 
     return (
         <div>

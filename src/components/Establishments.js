@@ -3,15 +3,13 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Establishments.css'
 
-const BASE_URL = 'http://localhost:3000/api'
-
 function Establishments() {
     const [establishments, setEstablishments] = useState([]);
     const navigate = useNavigate();
 
     const getEstablishments = async () => {
         try {
-            const result = await axios.get(`${BASE_URL}/establishment`);
+            const result = await axios.get(`${process.env.REACT_APP_BASE_URL}/establishment`);
             setEstablishments(result.data);
         }
         catch (err) {
@@ -27,7 +25,7 @@ function Establishments() {
 
     useEffect(() => {
         getEstablishments();
-    })
+    }, [])
 
     return (
         <div>
