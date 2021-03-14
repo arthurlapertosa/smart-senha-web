@@ -45,6 +45,16 @@ function Passwords() {
         }
     }
 
+    const setAsCanceled = async (id) => {
+        try {
+            await axios.put(`${BASE_URL}/password/cancel/${id}`);
+            updatePasswords();
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
     const deletePassword = async (id) => {
         try {
             await axios.delete(`${BASE_URL}/password/${id}`);
@@ -61,6 +71,10 @@ function Passwords() {
 
     useEffect(() => {
         updatePasswords();
+        const interval = setInterval(() => updatePasswords(), 5000)
+        return () => {
+            clearInterval(interval);
+        }
     }, [])
 
     return (
@@ -72,6 +86,7 @@ function Passwords() {
                     <th>Chamar senha</th>
                     <th>Atendido?</th>
                     <th>Marcar como atendido</th>
+                    <th>Cancelar</th>
                     <th>Excluir</th>
                 </tr>
                 {passwords.map((password, index) => {
@@ -91,18 +106,30 @@ function Passwords() {
                                     'Senha chamada!'
                                     :
                                     <button
-                                        disabled={password.already_attended}
+                                        disabled={password.already_attended || password.canceled}
                                         onClick={() => callPassword(password.id)}>Chamar senha</button>
                                 }
                             </td>
-                            <td style={{
-                                backgroundColor: password.already_attended ? 'green' : 'red',
-                                color: 'white'
-                            }}>
-                                {password.already_attended ? 'Sim' : 'Não'}
+                            {password.canceled ?
+                                <td style={{
+                                    backgroundColor: 'black',
+                                    color: 'white'
+                                }}>
+                                    Senha cancelada!
+                                </td>
+                                :
+                                <td style={{
+                                    backgroundColor: password.already_attended ? 'green' : 'red',
+                                    color: 'white'
+                                }}>
+                                    {password.already_attended ? 'Sim' : 'Não'}
+                                </td>
+                            }
+                            <td>
+                                <button disabled={password.already_attended || password.canceled} onClick={() => setAsAttended(password.id)}>Marcar como atendido</button>
                             </td>
                             <td>
-                                <button disabled={password.already_attended} onClick={() => setAsAttended(password.id)}>Marcar como atendido</button>
+                                <button disabled={password.canceled} onClick={() => setAsCanceled(password.id)}>Cancelar</button>
                             </td>
                             <td>
                                 <button onClick={() => deletePassword(password.id)}>Excluir</button>
